@@ -20,9 +20,10 @@ router.get('/', verify, async (req, res) => {
     ON user_address.user_id = user_details.id
     LEFT JOIN user_payment
     ON user_payment.user_id = user_details.id
-    WHERE user_details.id = ${req.user.id}
+    WHERE user_details.id = $1}
         AND NOT NULL;`
-    const userResponse = await client.query(userQuery);
+    const userValues = [req.user.id]
+    const userResponse = await client.query(userQuery, userValues);
     res.status(200).send(userResponse.rows);
     console.log(userResponse.rows);
 })

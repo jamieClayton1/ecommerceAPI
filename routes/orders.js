@@ -14,8 +14,9 @@ const pool = new Pool({
 router.get('/', verify, async (req, res) => {
     const client = await pool.connect();
 
-    const ordersQuery = `SELECT * FROM order_details WHERE user_id = ${req.user.id}`;
-    const ordersResponse = await client.query(ordersQuery);
+    const ordersQuery = `SELECT * FROM order_details WHERE user_id = $1`;
+    const ordersValues = [req.user.id]
+    const ordersResponse = await client.query(ordersQuery, ordersValues);
     res.status(200).send(ordersResponse.rows);
 })
 
@@ -27,9 +28,10 @@ router.get('/:orderId', verify, async (req, res) => {
     FROM order_items 
     LEFT JOIN order_details 
     ON order_details.id = order_items.order_id 
-    WHERE order_items.order_id = ${req.params.orderId} AND order_details.user_id = ${req.user.id};`
+    WHERE order_items.order_id = $1 AND order_details.user_id = $2;`
+    const ordersValues = [req.params.orderId, req.user.id]
 
-    const ordersResponse = await client.query(ordersQuery);
+    const ordersResponse = await client.query(ordersQuery, ordersValues);
     
     res.status(200).send(ordersResponse.rows);
 })

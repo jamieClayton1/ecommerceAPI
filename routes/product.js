@@ -13,8 +13,9 @@ const categoryQuery = async function(req, res, next) {
     if(!req.query.yourQuery) return next();
     console.log(req.query)
     const client = await pool.connect();
-        const productCategoryQuery = `SELECT * FROM product WHERE category_id = '${req.query.category}'`
-        const productCategoryResponse = await client.query(productCategoryQuery);
+        const productCategoryQuery = `SELECT * FROM product WHERE category_id = '$1'`
+        const productCategoryValues = [req.query.category]
+        const productCategoryResponse = await client.query(productCategoryQuery, productCategoryValues);
         res.status(200).send(productCategoryResponse.rows);
     }
 
@@ -32,8 +33,9 @@ router.get('/', categoryQuery, async (req,res) => {
 
 router.get('/:productId', async (req,res) => {
     const client = await pool.connect();
-    const productQuery = `SELECT * FROM product WHERE id = '${req.params.productId}'`;
-    const productResponse = await client.query(productQuery);
+    const productQuery = `SELECT * FROM product WHERE id = $1`;
+    const productValues = [req.params.productId]
+    const productResponse = await client.query(productQuery, productValues);
     console.log(productResponse.rows);
     res.status(200).send(productResponse.rows);
 })

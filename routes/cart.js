@@ -13,22 +13,25 @@ const pool = new Pool({
 
 router.post('/add', verify, async (req, res) => {
     const client = await pool.connect();
-    const cartQuery = `INSERT INTO cart_item (product_id, user_id) VALUES (${req.body.product_id}, ${req.user.id});`
-    const cartResponse = await client.query(cartQuery);
+    const cartQuery = `INSERT INTO cart_item (product_id, user_id) VALUES ($1, $2);`
+    const cartValues = [req.body.product_id, req.user.id]
+    const cartResponse = await client.query(cartQuery, cartValues);
     res.status(200).send("Added to cart!");
 });
 
 router.post('/delete/:id', verify, async (req,res) => {
     const client = await pool.connect();
-    const cartQuery = `DELETE FROM cart_item WHERE id = ${req.params.id}`;
-    const cartResponse = await client.query(cartQuery);
+    const cartQuery = `DELETE FROM cart_item WHERE id = $1`;
+    const cartValues = [req.params.id]
+    const cartResponse = await client.query(cartQuery,  cartValues);
     res.status(200).send("Removed from cart.");
 })
 
 router.get('/', verify, async (req, res) => {
     const client = await pool.connect();
-    const cartQuery = `SELECT * FROM cart_item WHERE user_id = ${req.user.id}`
-    const cartResponse = await client.query(cartQuery);
+    const cartQuery = `SELECT * FROM cart_item WHERE user_id = $1`
+    const cartValues = [req.user.id]
+    const cartResponse = await client.query(cartQuery, cartValues);
     res.status(200).send(cartResponse.rows);
 })
 
