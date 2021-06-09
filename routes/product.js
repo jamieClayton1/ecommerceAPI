@@ -10,13 +10,20 @@ const pool = new Pool({
 });
 
 const categoryQuery = async function(req, res, next) {
-    if(!req.query.yourQuery) return next();
-    console.log(req.query)
+    console.log("middleware")
+    if(!req.query.category) {
+        console.log("No query found")
+        return next();
+    }
+    else {
+    console.log("Query recieved")
     const client = await pool.connect();
-        const productCategoryQuery = `SELECT * FROM product WHERE category_id = '$1'`
+        const productCategoryQuery = `SELECT * FROM product WHERE category_id = $1`
         const productCategoryValues = [req.query.category]
+        console.log(productCategoryValues);
         const productCategoryResponse = await client.query(productCategoryQuery, productCategoryValues);
         res.status(200).send(productCategoryResponse.rows);
+    }
     }
 
 
@@ -30,6 +37,13 @@ router.get('/', categoryQuery, async (req,res) => {
     }
 )
 
+router.get('/categories', async (req,res) => {
+    const client = await pool.connect();
+    const categoryQuery = `SELECT * FROM product_category`
+    const categoryResponse = await client.query(categoryQuery);
+    res.status(200).send(categoryResponse.rows);
+})
+
 
 router.get('/:productId', async (req,res) => {
     const client = await pool.connect();
@@ -39,6 +53,8 @@ router.get('/:productId', async (req,res) => {
     console.log(productResponse.rows);
     res.status(200).send(productResponse.rows);
 })
+
+
 
 
 

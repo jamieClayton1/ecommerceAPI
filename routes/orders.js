@@ -24,10 +24,12 @@ router.get('/:orderId', verify, async (req, res) => {
     const client = await pool.connect();
 
     const ordersQuery =
-    `SELECT order_id, total, product_id, quantity 
+    `SELECT order_id, total, product_id, quantity, name, description, price
     FROM order_items 
     LEFT JOIN order_details 
     ON order_details.id = order_items.order_id 
+    LEFT JOIN product
+    ON order_items.product_id = product.id
     WHERE order_items.order_id = $1 AND order_details.user_id = $2;`
     const ordersValues = [req.params.orderId, req.user.id]
 

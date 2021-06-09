@@ -44,7 +44,7 @@ router.post('/register', async (req, res) => {
 // Log in
 
 router.post('/login', async (req, res) => {
-
+    try {
     const client =  await pool.connect();
     
     const {error} = loginValidation(req.body);
@@ -72,8 +72,11 @@ router.post('/login', async (req, res) => {
 
     const token =
     jwt.sign({id: tokenId}, process.env.TOKEN_SECRET);
-
-    res.header('auth-token', token).send(token);
+        console.log(token);
+    res.header('auth-token', token).send(token);}
+    catch(err) {
+        res.send({error : message});
+    }
 })
 
 module.exports = router;

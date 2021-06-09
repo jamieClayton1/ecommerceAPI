@@ -20,8 +20,8 @@ router.get('/', verify, async (req, res) => {
     ON user_address.user_id = user_details.id
     LEFT JOIN user_payment
     ON user_payment.user_id = user_details.id
-    WHERE user_details.id = $1}
-        AND NOT NULL;`
+    WHERE user_payment.user_id = $1;
+    `
     const userValues = [req.user.id]
     const userResponse = await client.query(userQuery, userValues);
     res.status(200).send(userResponse.rows);
@@ -35,13 +35,13 @@ router.patch('/', verify, async (req, res) => {
     const valueEdit = req.body.value;
     
     const editQuery = () => {
-    if (tableEdit === 'user_details') {
+    if (tableEdit == 'user_details') {
         return `UPDATE user_details
-        SET ${columnEdit} = ${valueEdit}
+        SET ${columnEdit} = '${valueEdit}'
         WHERE id = ${req.user.id};`  
     } else {
         return `UPDATE ${tableEdit}
-        SET ${columnEdit} = ${valueEdit}
+        SET ${columnEdit} = '${valueEdit}'
         WHERE user_id = ${req.user.id};`  
     }
 }
